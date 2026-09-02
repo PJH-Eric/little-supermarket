@@ -26,6 +26,11 @@
     cookie: { key: 'cookie', label: '餅乾', category: '點心', color: '#d9aa79', icon: 'cookie' },
     cheese: { key: 'cheese', label: '起司', category: '冷藏', color: '#f3c85b', icon: 'cheese' }
   };
+  var TASK_TYPES = ['shopping', 'category', 'counting'];
+  var CATEGORY_TASKS = [
+    { category: '水果', keys: ['apple', 'banana'] },
+    { category: '冷藏', keys: ['milk', 'cheese'] }
+  ];
 
   var DIFFICULTIES = {
     easy: { key: 'easy', label: '簡單', rounds: 3, items: 2, maxQuantity: 2, aiDelay: 1350 },
@@ -45,12 +50,45 @@
       var j = Math.floor(rng() * (i + 1));
       var swap = keys[i]; keys[i] = keys[j]; keys[j] = swap;
     }
-    for (var n = 0; n < config.items; n++) {
-      order[keys[n]] = 1 + Math.floor(rng() * config.maxQuantity);
+    var taskType = TASK_TYPES[(round - 1) % TASK_TYPES.length];
+    var task;
+    if (taskType === 'category') {
+      var categoryTask = CATEGORY_TASKS[Math.floor(rng() * CATEGORY_TASKS.length)];
+      categoryTask.keys.forEach(function (key) { order[key] = 1; });
+      task = {
+        type: taskType,
+        label: '分類小達人',
+        title: '請找出：',
+        instruction: '請找出所有' + categoryTask.category + '商品！',
+        category: categoryTask.category
+      };
+    } else if (taskType === 'counting') {
+      var targetKey = keys[0];
+      var quantity = 1 + Math.floor(rng() * config.maxQuantity);
+      order[targetKey] = quantity;
+      task = {
+        type: taskType,
+        label: '數數小高手',
+        title: '請數到：',
+        instruction: '請幫我數出 ' + quantity + ' 個' + PRODUCTS[targetKey].label + '！',
+        targetKey: targetKey,
+        targetQuantity: quantity
+      };
+    } else {
+      for (var n = 0; n < config.items; n++) {
+        order[keys[n]] = 1 + Math.floor(rng() * config.maxQuantity);
+      }
+      task = {
+        type: taskType,
+        label: '購物清單',
+        title: '請幫我找：',
+        instruction: '清單上的商品都要找到喔！'
+      };
     }
     return {
       round: round,
       items: order,
+      task: task,
       customer: ['兔兔', '小熊', '企鵝', '小貓', '小狐狸'][(round - 1) % 5]
     };
   }
@@ -121,6 +159,13 @@
     if (!product) return { ok: false, code: 'unknown-product', error: '找不到這個商品。' };
     var needed = state.order.items[product.key] || 0;
     var got = state.collected[product.key] || 0;
+    if (!needed) {
+      state.mistakes += 1;
+      var wrongTaskError = state.order.task.type === 'category'
+        ? '這不是這次要找的分類，換一個看看。'
+        : '這個商品不在清單裡，看看其他需要的商品。';
+      return { ok: false, code: 'not-needed', error: wrongTaskError };
+    }
     if (got >= needed) {
       state.mistakes += 1;
       return { ok: false, code: 'not-needed', error: '這樣商品已經買夠了，看看清單上的其他商品。' };
@@ -172,6 +217,7 @@
       status: state.status,
       startedAt: state.startedAt,
       customer: state.order.customer,
+      task: clone(state.order.task),
       order: clone(state.order.items),
       collected: clone(state.collected),
       mistakes: state.mistakes,
@@ -196,6 +242,7 @@
     MAX_ROUNDS: MAX_ROUNDS,
     PRODUCT_ORDER: PRODUCT_ORDER,
     PRODUCTS: PRODUCTS,
+    TASK_TYPES: TASK_TYPES,
     DIFFICULTIES: DIFFICULTIES,
     difficultyOf: difficultyOf,
     productOf: productOf,

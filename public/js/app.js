@@ -113,24 +113,29 @@
   }
 
   function renderSummary(state, online) {
+    var task = state.task || { label: '購物清單', instruction: '清單上的商品都要找到喔！' };
     var roleText = online ? (app.online.role === 'observer' ? '你正在觀戰，只能看大家購物。' : '你是購物員，可以點商品和結帳。') : (app.local.ai ? '小幫手會慢慢幫你找商品。' : '自己慢慢找，找對就會放進購物籃。');
     var progress = state.totalNeeded ? Math.round(state.totalCollected / state.totalNeeded * 100) : 0;
     var scores = (state.players || []).map(function (player) { return '<div class="score-line"><span>' + escapeHtml(player.name) + '</span><strong>' + player.score + ' 分</strong></div>'; }).join('');
-    $('summaryBox').innerHTML = '<span class="summary-label">現在的任務</span><strong class="summary-value">幫 ' + escapeHtml(state.customer) + ' 買齊清單</strong><div class="summary-meter" aria-label="購物進度"><i style="width:' + progress + '%"></i></div><span class="summary-label" style="margin-top:8px">購物進度 ' + state.totalCollected + ' / ' + state.totalNeeded + '</span><p class="summary-value" style="font-size:.8rem;margin:13px 0 0">' + roleText + '</p><div class="score-list">' + scores + '</div>';
+    $('summaryBox').innerHTML = '<span class="summary-label">現在的任務</span><strong class="summary-value">' + escapeHtml(task.label) + '</strong><span class="summary-value task-instruction">' + escapeHtml(task.instruction) + '</span><div class="summary-meter" aria-label="購物進度"><i style="width:' + progress + '%"></i></div><span class="summary-label" style="margin-top:8px">購物進度 ' + state.totalCollected + ' / ' + state.totalNeeded + '</span><p class="summary-value" style="font-size:.8rem;margin:13px 0 0">' + roleText + '</p><div class="score-list">' + scores + '</div>';
   }
 
   function renderGame(state, online) {
     if (!state) return;
+    var task = state.task || { type: 'shopping', label: '購物清單', title: '請幫我找：', instruction: '清單上的商品都要找到喔！' };
     GameAudio.startMusic();
     var observer = online && app.online.role === 'observer';
-    $('gameEyebrow').textContent = online ? (observer ? '線上合作｜觀戰中' : '線上合作任務') : (app.local.ai ? '和小幫手一起' : '今天的客人');
-    $('gameTitle').textContent = online ? '一起買齊' : '購物清單';
+    $('gameEyebrow').textContent = (online ? (observer ? '線上合作｜觀戰中' : '線上合作任務') : (app.local.ai ? '和小幫手一起' : '今天的客人')) + '｜' + task.label;
+    $('gameTitle').textContent = task.label;
     $('roundChip').textContent = '第 ' + state.currentRound + ' / ' + state.maxRounds + ' 張';
-    $('customerBubble').textContent = state.customer + '想買一些東西～';
+    $('customerBubble').textContent = state.customer + '說：「' + task.instruction + '」';
     $('customerCharacter').innerHTML = customerSvg();
     var keys = SupermarketRules.PRODUCT_ORDER.filter(function (key) { return state.order[key]; });
     var total = state.totalNeeded || 0;
     $('listProgress').textContent = state.totalCollected + ' / ' + total;
+    $('listTitle').textContent = task.title || '請幫我找：';
+    $('listInstruction').textContent = task.instruction || '清單上的商品都要找到喔！';
+    $('shelfInstruction').textContent = task.type === 'category' ? '找出同一類的商品' : task.type === 'counting' ? '數一數，點到指定數量' : '找到商品，點一下放進籃子';
     $('orderItems').innerHTML = keys.map(function (key) {
       var got = state.collected[key] || 0; var need = state.order[key]; var p = SupermarketRules.productOf(key);
       return '<div class="order-item ' + (got >= need ? 'done' : '') + '">' + '<span class="order-icon">' + productSvg(key, 36) + '</span><span><strong>' + p.label + '</strong><small>' + got + ' / ' + need + ' 個</small></span></div>';

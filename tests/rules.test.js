@@ -47,6 +47,19 @@ while (first.status !== 'finished') {
 assert.strictEqual(first.status, 'finished');
 log('最後一張清單結帳後完成整局');
 
+const varied = Rules.createGame({ seed: 'varied-tasks', difficulty: 'hard', players: [{ id: 'p1' }], now: 1 });
+const taskTypes = [];
+while (varied.status !== 'finished') {
+  const task = Rules.snapshot(varied);
+  taskTypes.push(task.task.type);
+  Object.entries(task.order).forEach(([key, quantity]) => {
+    for (let i = 0; i < quantity; i += 1) Rules.collect(varied, 'p1', key);
+  });
+  Rules.checkout(varied, 'p1');
+}
+assert.deepStrictEqual(taskTypes, ['shopping', 'category', 'counting', 'shopping', 'category']);
+log('同一局會輪替購物、分類與數數任務');
+
 const aiGame = Rules.createGame({ seed: 'ai-seed', difficulty: 'hard', players: [{ id: 'p1' }, { id: 'helper' }], now: 0 });
 const brain = AI.createBrain('hard', 'ai-seed');
 const move = brain.step(Rules.snapshot(aiGame), 1000);

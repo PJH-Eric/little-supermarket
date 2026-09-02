@@ -109,8 +109,8 @@
           <article class="game-board-area">
             <div class="game-topline"><div><p class="eyebrow" id="gameEyebrow">今天的客人</p><h1 id="gameTitle">購物清單</h1></div><div class="round-chip" id="roundChip">第 1 張</div></div>
             <div class="customer-note"><div class="customer-bubble" id="customerBubble">嗨！我想買一些東西～</div><span class="customer-character" id="customerCharacter" aria-hidden="true">客</span></div>
-            <div class="shopping-list paper-card"><div class="list-title"><span class="list-check" aria-hidden="true">✓</span><strong>請幫我找：</strong><span class="list-progress" id="listProgress">0 / 0</span></div><div class="order-items" id="orderItems"></div></div>
-            <div class="shelf-heading"><div><p class="eyebrow">逛逛貨架</p><h2>找到商品，點一下放進籃子</h2></div><div class="basket-counter" id="basketCounter"><span class="basket-mini" aria-hidden="true"></span><strong>0</strong></div></div>
+            <div class="shopping-list paper-card"><div class="list-title"><span class="list-check" aria-hidden="true">✓</span><strong id="listTitle">請幫我找：</strong><span class="list-progress" id="listProgress">0 / 0</span></div><p class="list-instruction" id="listInstruction">清單上的商品都要找到喔！</p><div class="order-items" id="orderItems"></div></div>
+            <div class="shelf-heading"><div><p class="eyebrow">逛逛貨架</p><h2 id="shelfInstruction">找到商品，點一下放進籃子</h2></div><div class="basket-counter" id="basketCounter"><span class="basket-mini" aria-hidden="true"></span><strong>0</strong></div></div>
             <div class="product-grid" id="productGrid"></div>
             <div class="checkout-bar paper-card"><div><strong id="checkoutMessage">還有商品要找找看喔！</strong><small id="checkoutSubmessage">不急，慢慢找就好。</small></div><button class="primary-button checkout-button" id="checkoutButton" disabled>去結帳 <span>→</span></button></div>
           </article>
@@ -128,7 +128,7 @@
   </dialog>
 
   <dialog class="modal" id="tutorialDialog" aria-labelledby="tutorialTitle">
-    <div class="modal-card paper-card tutorial-card"><button class="modal-close" id="tutorialClose" aria-label="關閉教學">×</button><p class="eyebrow">三步就會玩</p><h2 id="tutorialTitle">小小店員出發！</h2><ol class="tutorial-list"><li><span>1</span><div><strong>看清楚購物清單</strong><p>清單會告訴你要買什麼、要買幾個。</p></div></li><li><span>2</span><div><strong>點商品放入購物籃</strong><p>點一下正確商品，就會自動放進籃子。</p></div></li><li><span>3</span><div><strong>買齊後去結帳</strong><p>大家一起把清單買齊，就可以開心結帳！</p></div></li></ol><button class="primary-button full-button" id="tutorialStartButton">我知道了，開始玩</button></div>
+    <div class="modal-card paper-card tutorial-card"><button class="modal-close" id="tutorialClose" aria-label="關閉教學">×</button><p class="eyebrow">三步就會玩</p><h2 id="tutorialTitle">小小店員出發！</h2><ol class="tutorial-list"><li><span>1</span><div><strong>看清楚本回合任務</strong><p>可能是購物清單、分類商品，或數出指定數量。</p></div></li><li><span>2</span><div><strong>依任務點商品</strong><p>點一下正確商品，就會自動放進購物籃。</p></div></li><li><span>3</span><div><strong>完成後去結帳</strong><p>任務完成後按下結帳，就能迎接下一位客人！</p></div></li></ol><button class="primary-button full-button" id="tutorialStartButton">我知道了，開始玩</button></div>
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
