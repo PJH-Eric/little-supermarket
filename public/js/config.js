@@ -29,34 +29,19 @@
     return { url: parsed.origin + parsed.pathname.replace(/\/+$/, ''), status: 'ok', source: source, error: null };
   }
 
-  function validateWs(raw) {
-    if (!raw) return { url: null, status: 'unset', error: null };
-    var parsed;
-    try { parsed = new URL(raw); } catch (error) {
-      return { url: null, status: 'invalid', error: 'WebSocket 網址不是合法的完整網址。' };
-    }
-    if (parsed.protocol !== 'ws:' && parsed.protocol !== 'wss:') {
-      return { url: null, status: 'invalid', error: 'WebSocket 網址只能使用 ws 或 wss。' };
-    }
-    if (loc.protocol === 'https:' && parsed.protocol === 'ws:') {
-      return { url: null, status: 'invalid', error: 'HTTPS 頁面不能連線到不安全的 ws。' };
-    }
+  function deriveWs(httpUrl) {
+    if (!httpUrl) return { url: null, status: 'unset', error: null };
+    var parsed = new URL(httpUrl);
+    parsed.protocol = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
     return { url: parsed.toString().replace(/\/$/, ''), status: 'ok', error: null };
   }
 
   var queryServer = query(loc.search, ['serverUrl', 'server']);
-  var queryWs = query(loc.search, ['wsUrl', 'ws']);
   var httpRaw = queryServer || String(runtime.serverUrl || '').trim();
   var httpSource = queryServer ? 'query' : (runtime.serverUrl ? 'injected' : 'none');
   var http = validateHttp(httpRaw, httpSource);
-  var wsRaw = queryWs || String(runtime.wsUrl || '').trim();
-  var ws = validateWs(wsRaw);
-  if (!ws.url && ws.status === 'unset' && http.url) {
-    /* 只在設定邊界由已驗證的 HTTP URL 映射協定，元件不自行猜測。 */
-    var httpParsed = new URL(http.url);
-    httpParsed.protocol = httpParsed.protocol === 'https:' ? 'wss:' : 'ws:';
-    ws = validateWs(httpParsed.toString());
-  }
+  /* 只在設定邊界由已驗證的 HTTP URL 映射協定，元件不自行猜測。 */
+  var ws = deriveWs(http.url);
 
   var entryParams = new URLSearchParams(loc.search || '');
   var room = String(entryParams.get('room') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
@@ -68,7 +53,7 @@
     wsUrl: ws.url,
     status: http.status,
     source: http.source,
-    error: http.error || ws.error,
+    error: http.error,
     isOnlineEnabled: function () { return http.status === 'ok' && ws.status === 'ok'; },
     url: function (pathname) {
       if (!http.url) return null;
@@ -90,7 +75,6 @@
         'role=' + encodeURIComponent(inviteRole || 'player')
       ];
       if (http.url && http.source === 'query') qs.push('serverUrl=' + encodeURIComponent(http.url));
-      if (wsRaw && ws.status === 'ok' && queryWs) qs.push('wsUrl=' + encodeURIComponent(ws.url));
       return base + '?' + qs.join('&');
     },
     checkHealth: function (callback) {
@@ -101,8 +85,7 @@
         clearTimeout(timer); callback(response.ok ? 'ok' : 'fail');
       }).catch(function () { clearTimeout(timer); callback('fail'); });
     },
-    _validateHttp: validateHttp,
-    _validateWs: validateWs
+    _validateHttp: validateHttp
   };
 
   w.GameConfig = Config;

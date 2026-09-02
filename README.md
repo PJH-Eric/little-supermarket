@@ -16,8 +16,8 @@ npm start
 前端只從 `public/js/config.js` 取得連線位置。可以用以下方式設定：
 
 1. 同源：Render server 同時服務 `public` 時會自動使用同源。
-2. GitHub Pages：在 repository 的 Settings → Secrets and variables → Actions → Variables 建立 `GAME_SERVER_URL`，可選建立 `GAME_SERVER_WS_URL`；Pages workflow 會在部署時注入。
-3. 臨時切換：在 Pages 網址後加入 `?serverUrl=https%3A%2F%2Fyour-render-service.onrender.com`。正式頁面使用 HTTPS 時，伺服器也必須提供 `wss://`；若沒有額外設定 `GAME_SERVER_WS_URL`，程式會在設定邊界將已驗證的 HTTPS URL 映射為 WSS。
+2. GitHub Pages：在 repository 的 Settings → Secrets and variables → Actions → Variables 只建立 `GAME_SERVER_URL`；Pages workflow 會在部署時注入，並由設定模組自動將 HTTPS 對應為 WSS。
+3. 臨時切換：在 Pages 網址後加入 `?serverUrl=https%3A%2F%2Fyour-render-service.onrender.com`。正式頁面使用 HTTPS 時，`GAME_SERVER_URL` 請使用 HTTPS，WebSocket 會自動使用 WSS。
 
 Render server 的環境變數請至少設定：
 
@@ -32,7 +32,7 @@ GAME_ALLOWED_ORIGIN=https://YOUR_GITHUB_USER.github.io
 工作流程位於 `.github/workflows/pages.yml`，推送到 `main` 後會：
 
 1. 安裝 lockfile 指定的依賴。
-2. 讀取 repository variable `GAME_SERVER_URL` / `GAME_SERVER_WS_URL`，產生不含秘密的 `public/runtime-config.js`。
+2. 讀取 repository variable `GAME_SERVER_URL`，產生不含秘密的 `public/runtime-config.js`；WebSocket URL 由同一個網址自動推導。
 3. 上傳 `public` 為 Pages artifact 並部署。
 
 第一次使用時，請在 GitHub repository 的 Settings → Pages → Build and deployment 將 Source 設為 **GitHub Actions**。GitHub Pages 與 Render 的正式網址、origin 和帳號授權仍需由專案擁有者在平台上設定。

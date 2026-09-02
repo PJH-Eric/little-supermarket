@@ -87,7 +87,7 @@ function createServer(options = {}) {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
     const origin = `${protocol}://${req.get('host')}`;
     res.type('application/javascript').set('Cache-Control', 'no-cache').send(
-      `window.__LITTLE_SUPERMARKET_CONFIG__ = { serverUrl: ${JSON.stringify(origin)}, wsUrl: '' };`
+      `window.__LITTLE_SUPERMARKET_CONFIG__ = { serverUrl: ${JSON.stringify(origin)} };`
     );
   });
   app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'], setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache') }));

@@ -34,7 +34,6 @@ jobs:
         run: npm run build:pages
         env:
           GAME_SERVER_URL: ${{ vars.GAME_SERVER_URL }}
-          GAME_SERVER_WS_URL: ${{ vars.GAME_SERVER_WS_URL }}
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:

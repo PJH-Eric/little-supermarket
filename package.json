@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
-    "test": "node tests/rules.test.js && node tests/online.test.js",
+    "test": "node tests/rules.test.js && node tests/config.test.js && node tests/online.test.js",
     "test:rules": "node tests/rules.test.js",
     "test:online": "node tests/online.test.js",
     "build:pages": "node scripts/inject-server-url.js",
