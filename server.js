@@ -95,6 +95,19 @@ function createServer(options = {}) {
     ok: true, service: 'little-supermarket', uptimeSec: Math.round((Date.now() - startedAt) / 1000), rooms: store.list().length
   }));
   app.get('/api/rooms', (_req, res) => res.json({ rooms: store.list() }));
+  app.get('/api/presence', (_req, res) => {
+    const activeSessions = [...sessions.values()];
+    const activeRoomCodes = new Set(activeSessions.filter((session) => session.roomCode).map((session) => session.roomCode));
+    res.json({
+      gameId: 'little-supermarket',
+      online: activeSessions.length,
+      players: activeSessions.filter((session) => session.roomCode && session.role === 'player').length,
+      spectators: activeSessions.filter((session) => session.roomCode && session.role === 'observer').length,
+      lobby: activeSessions.filter((session) => !session.roomCode).length,
+      rooms: activeRoomCodes.size,
+      updatedAt: new Date().toISOString()
+    });
+  });
 
   const server = http.createServer(app);
   const wss = new WebSocketServer({
