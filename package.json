@@ -1,0 +1,24 @@
+{
+  "name": "little-supermarket",
+  "version": "1.0.0",
+  "description": "小小超市：平板優先的幼兒教育合作小遊戲",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/rules.test.js && node tests/online.test.js",
+    "test:rules": "node tests/rules.test.js",
+    "test:online": "node tests/online.test.js",
+    "build:pages": "node scripts/inject-server-url.js",
+    "verify": "npm test && npm run build:pages"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  },
+  "license": "MIT",
+  "private": false
+}

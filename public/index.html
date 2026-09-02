@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff6df">
+  <meta name="description" content="小小超市：給幼兒的數數、分類與生活學習小遊戲">
+  <title>小小超市｜一起買齊吧！</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand-button" id="brandHome" aria-label="回到小小超市首頁">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span><strong>小小超市</strong><small>一起買齊吧！</small></span>
+      </button>
+      <div class="top-actions">
+        <span class="connection-pill" id="connectionPill">單機準備好了</span>
+        <button class="icon-button" id="settingsButton" aria-label="開啟遊戲設定" title="遊戲設定">⚙</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="screen active" id="screenHome" aria-labelledby="homeTitle">
+        <div class="home-grid">
+          <div class="hero-card paper-card">
+            <div class="sunburst" aria-hidden="true"></div>
+            <div class="hero-copy">
+              <p class="eyebrow">歡迎來到彩虹小超市</p>
+              <h1 id="homeTitle">今天要幫誰<br><em>買東西</em>呢？</h1>
+              <p class="hero-text">看清楚購物清單，找到正確商品，放進購物籃，再一起結帳吧！</p>
+              <button class="text-link" id="tutorialButton">先看看怎麼玩 <span>→</span></button>
+            </div>
+            <div class="hero-shop" aria-hidden="true">
+              <div class="awning"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="shop-window"><div class="window-shelf"></div><div class="window-bag">SHOP</div></div>
+              <div class="shop-door"></div>
+              <div class="shop-sign">小小超市</div>
+            </div>
+          </div>
+
+          <div class="home-panel">
+            <div class="paper-card welcome-card">
+              <label for="playerName">小店員的名字</label>
+              <input id="playerName" maxlength="20" autocomplete="nickname" placeholder="例如：小花" value="">
+              <p class="field-hint">可以輸入暱稱，不需要註冊。</p>
+            </div>
+
+            <div class="paper-card mode-card">
+              <div class="section-heading"><div><p class="eyebrow">選一個任務</p><h2>今天想怎麼玩？</h2></div><span class="sticker" aria-hidden="true">GO!</span></div>
+              <div class="mode-list" role="list">
+                <button class="mode-option selected" data-mode="solo" role="listitem">
+                  <span class="mode-icon icon-basket" aria-hidden="true"></span><span><strong>自己逛超市</strong><small>慢慢找商品，完成購物清單</small></span><span class="radio-dot"></span>
+                </button>
+                <button class="mode-option" data-mode="ai" role="listitem">
+                  <span class="mode-icon icon-helper" aria-hidden="true"></span><span><strong>和小幫手一起</strong><small>選擇難度，一起分工購物</small></span><span class="radio-dot"></span>
+                </button>
+                <button class="mode-option" data-mode="online" role="listitem">
+                  <span class="mode-icon icon-people" aria-hidden="true"></span><span><strong>和朋友一起玩</strong><small>建立房間，合作買齊清單</small></span><span class="radio-dot"></span>
+                </button>
+              </div>
+              <div class="difficulty-row" id="difficultyRow" hidden>
+                <label for="difficulty">小幫手難度</label>
+                <select id="difficulty"><option value="easy">簡單｜慢慢來</option><option value="normal" selected>普通｜小幫手</option><option value="hard">困難｜快手店員</option></select>
+              </div>
+              <button class="primary-button full-button" id="homeActionButton">開始自己逛</button>
+              <p class="offline-note" id="offlineNote">線上功能：<span id="serverDescription">未設定</span></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screenLobby" aria-labelledby="lobbyTitle">
+        <div class="page-card paper-card">
+          <div class="page-heading"><div><button class="back-link" data-action="home">← 回首頁</button><p class="eyebrow">朋友一起玩</p><h1 id="lobbyTitle">超市大廳</h1><p>建立一間房間，或加入朋友已經開好的房間。</p></div><button class="secondary-button" id="refreshLobby">重新整理</button></div>
+          <div class="lobby-actions"><button class="primary-button" id="createRoomButton">＋ 開一間新超市</button><p class="lobby-status" id="lobbyStatus">正在準備連線…</p></div>
+          <div class="room-list" id="roomList" aria-live="polite"></div>
+          <div class="empty-state" id="roomEmpty" hidden><span class="empty-basket" aria-hidden="true"></span><h2>目前還沒有房間</h2><p>你可以先開一間，邀請朋友來逛超市。</p></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screenRoom" aria-labelledby="roomTitle">
+        <div class="page-card paper-card room-page">
+          <div class="page-heading"><div><button class="back-link" data-action="leave-room">← 離開房間</button><p class="eyebrow">合作購物準備中</p><h1 id="roomTitle">房間 <span id="roomCodeText">----</span></h1><p id="roomNameText">歡迎來逛超市！</p></div><div class="room-badge" id="roomRoleBadge">購物員</div></div>
+          <div class="room-layout">
+            <div class="seat-panel">
+              <div class="panel-title"><h2>購物員</h2><span id="playerCountText">0 / 4</span></div>
+              <div class="seat-list" id="seatList"></div>
+              <div class="observer-line" id="observerLine">觀戰者 0 人</div>
+            </div>
+            <div class="room-controls">
+              <div class="invite-box" id="inviteBox"><div><strong>邀請朋友</strong><p>把連結傳給朋友，他可以直接加入這間超市。</p></div><button class="secondary-button" id="copyInviteButton">複製玩家連結</button><button class="small-link" id="copyObserverButton">複製觀戰連結</button><button class="small-link" id="refreshInviteButton">更新邀請連結</button></div>
+              <div class="room-rule-box"><span class="rule-icon" aria-hidden="true">籃</span><div><strong>合作完成購物清單</strong><p>大家一起找商品，任何購物員都可以結帳。</p></div></div>
+              <div class="room-bottom"><p class="room-hint" id="roomHint">準備好了就按下面的按鈕。</p><button class="primary-button" id="readyButton">準備好了</button><button class="primary-button" id="startRoomButton" hidden>開始合作購物</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen game-screen" id="screenGame" aria-labelledby="gameTitle">
+        <div class="game-layout">
+          <aside class="info-sidebar" id="infoSidebar">
+            <div class="sidebar-head"><div><p class="eyebrow">小小購物任務</p><h2>操作小抄</h2></div><button class="icon-button sidebar-close" id="closeSidebar" aria-label="收合資訊欄">×</button></div>
+            <div class="summary-box" id="summaryBox"></div>
+            <div class="chat-box" id="chatBox" hidden><div class="chat-heading"><strong>小小聊天室</strong><span id="chatRoomLabel">房間</span></div><div class="chat-messages" id="chatMessages"></div><form class="chat-form" id="chatForm"><input id="chatInput" maxlength="120" placeholder="說點鼓勵的話…" autocomplete="off"><button type="submit" aria-label="送出訊息">↑</button></form></div>
+          </aside>
+          <button class="floating-sidebar-button" id="openSidebar" aria-label="開啟操作小抄">☰ <span>小抄</span></button>
+          <article class="game-board-area">
+            <div class="game-topline"><div><p class="eyebrow" id="gameEyebrow">今天的客人</p><h1 id="gameTitle">購物清單</h1></div><div class="round-chip" id="roundChip">第 1 張</div></div>
+            <div class="customer-note"><div class="customer-bubble" id="customerBubble">嗨！我想買一些東西～</div><span class="customer-character" id="customerCharacter" aria-hidden="true">客</span></div>
+            <div class="shopping-list paper-card"><div class="list-title"><span class="list-check" aria-hidden="true">✓</span><strong>請幫我找：</strong><span class="list-progress" id="listProgress">0 / 0</span></div><div class="order-items" id="orderItems"></div></div>
+            <div class="shelf-heading"><div><p class="eyebrow">逛逛貨架</p><h2>找到商品，點一下放進籃子</h2></div><div class="basket-counter" id="basketCounter"><span class="basket-mini" aria-hidden="true"></span><strong>0</strong></div></div>
+            <div class="product-grid" id="productGrid"></div>
+            <div class="checkout-bar paper-card"><div><strong id="checkoutMessage">還有商品要找找看喔！</strong><small id="checkoutSubmessage">不急，慢慢找就好。</small></div><button class="primary-button checkout-button" id="checkoutButton" disabled>去結帳 <span>→</span></button></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="screenResult" aria-labelledby="resultTitle">
+        <div class="result-card paper-card"><div class="confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="eyebrow">任務完成</p><h1 id="resultTitle">今天的超市大明星！</h1><div class="result-stars" id="resultStars" aria-label="得到三顆星">★ ★ ★</div><p id="resultMessage">你和朋友一起把購物清單全部買齊了！</p><div class="result-scores" id="resultScores"></div><div class="result-actions"><button class="primary-button" id="playAgainButton">再玩一次</button><button class="secondary-button" id="resultHomeButton">回到首頁</button></div></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="modal" id="settingsDialog" aria-labelledby="settingsTitle">
+    <form method="dialog" class="modal-card paper-card" id="settingsForm"><button class="modal-close" value="cancel" aria-label="關閉設定">×</button><p class="eyebrow">小小超市設定</p><h2 id="settingsTitle">玩得舒服最重要</h2><label class="toggle-row"><span><strong>背景音樂</strong><small>輕輕的超市音樂</small></span><input type="checkbox" id="musicToggle"><i></i></label><label class="toggle-row"><span><strong>遊戲音效</strong><small>找到商品時的提示聲</small></span><input type="checkbox" id="soundToggle"><i></i></label><label class="toggle-row"><span><strong>震動回饋</strong><small>觸控裝置上的小提醒</small></span><input type="checkbox" id="vibrateToggle"><i></i></label><label class="toggle-row"><span><strong>減少動態</strong><small>把移動動畫變得更少</small></span><input type="checkbox" id="motionToggle"><i></i></label><div class="server-setting"><strong>線上伺服器</strong><small id="settingsServerText">未設定</small><p>也可以用網址參數 <code>?serverUrl=...</code> 暫時切換伺服器。</p></div><div class="modal-actions"><button class="secondary-button" id="resetSettingsButton" type="button">恢復預設</button><button class="primary-button" value="default">完成</button></div></form>
+  </dialog>
+
+  <dialog class="modal" id="tutorialDialog" aria-labelledby="tutorialTitle">
+    <div class="modal-card paper-card tutorial-card"><button class="modal-close" id="tutorialClose" aria-label="關閉教學">×</button><p class="eyebrow">三步就會玩</p><h2 id="tutorialTitle">小小店員出發！</h2><ol class="tutorial-list"><li><span>1</span><div><strong>看清楚購物清單</strong><p>清單會告訴你要買什麼、要買幾個。</p></div></li><li><span>2</span><div><strong>點商品放入購物籃</strong><p>點一下正確商品，就會自動放進籃子。</p></div></li><li><span>3</span><div><strong>買齊後去結帳</strong><p>大家一起把清單買齊，就可以開心結帳！</p></div></li></ol><button class="primary-button full-button" id="tutorialStartButton">我知道了，開始玩</button></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="runtime-config.js"></script>
+  <script src="js/rng.js"></script>
+  <script src="js/rules.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/online.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
