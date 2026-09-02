@@ -1,6 +1,7 @@
 (function (w) {
   'use strict';
 
+  var Config = w.GameConfig;
   var $ = function (id) { return document.getElementById(id); };
   var app = {
     mode: 'solo',
