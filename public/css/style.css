@@ -28,6 +28,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 4px s
 
 .app-shell { min-height: 100vh; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
 .topbar { height: 80px; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 12px clamp(18px, 4vw, 52px); position: sticky; top: 0; z-index: 20; background: rgba(255, 248, 233, .9); backdrop-filter: blur(12px); }
+.lobby-home-link { flex: 0 0 auto; display: inline-flex; align-items: center; min-height: 44px; padding: 8px 13px; border: 2px solid var(--coral-dark); border-radius: 14px; color: var(--ink); background: #fff5d6; box-shadow: 0 4px 0 #e5c982; font-size: .8rem; font-weight: 900; text-decoration: none; transition: transform .15s, box-shadow .15s, background .15s; }
+.lobby-home-link:hover { background: #fff0bf; transform: translateY(-2px); }
+.lobby-home-link:active { transform: translateY(3px); box-shadow: 0 1px 0 #e5c982; }
+.lobby-home-link:focus-visible { outline: 3px solid var(--mint-dark); outline-offset: 3px; }
 .brand-button { min-width: 0; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 0; text-align: left; }
 .brand-button strong, .brand-button small { display: block; }
 .brand-button strong { font-size: 1.18rem; letter-spacing: .06em; }
