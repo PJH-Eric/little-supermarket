@@ -75,6 +75,16 @@
       <section class="screen" id="screenLobby" aria-labelledby="lobbyTitle">
         <div class="page-card paper-card">
           <div class="page-heading"><div><button class="back-link" data-action="home">← 回首頁</button><p class="eyebrow">朋友一起玩</p><h1 id="lobbyTitle">超市大廳</h1><p>建立一間房間，或加入朋友已經開好的房間。</p></div><button class="secondary-button" id="refreshLobby">重新整理</button></div>
+          <div class="lobby-identity">
+            <label for="lobby-nick">玩家暱稱</label>
+            <input id="lobby-nick" maxlength="20" autocomplete="nickname" placeholder="小店員">
+            <p class="field-hint">邀請進房前可以在這裡改成你想使用的名字。</p>
+          </div>
+          <div class="invite-gate paper-card" id="invite-gate" hidden>
+            <strong>收到房間邀請</strong>
+            <p id="invite-gate-note">請先設定你的暱稱，再加入這間超市。</p>
+            <button class="primary-button" id="joinInviteButton">以此暱稱加入</button>
+          </div>
           <div class="lobby-actions"><button class="primary-button" id="createRoomButton">＋ 開一間新超市</button><p class="lobby-status" id="lobbyStatus">正在準備連線…</p></div>
           <div class="room-list" id="roomList" aria-live="polite"></div>
           <div class="empty-state" id="roomEmpty" hidden><span class="empty-basket" aria-hidden="true"></span><h2>目前還沒有房間</h2><p>你可以先開一間，邀請朋友來逛超市。</p></div>

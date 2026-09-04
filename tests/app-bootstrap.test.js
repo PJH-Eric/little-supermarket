@@ -67,5 +67,8 @@ function createContext() {
 
 const context = createContext();
 vm.runInNewContext(configSource, context);
+const html = fs.readFileSync(require.resolve('../public/index.html'), 'utf8');
+assert.ok(html.includes('id="lobby-nick"') && html.includes('id="invite-gate"') && html.includes('id="joinInviteButton"'),
+  '大廳必須提供邀請者確認暱稱的入口');
 assert.doesNotThrow(() => vm.runInNewContext(appSource, context), 'app.js 應能在瀏覽器啟動');
 console.log('✓ app.js 啟動時能取得 GameConfig');

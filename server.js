@@ -161,6 +161,7 @@ function createServer(options = {}) {
     if (!session) return fail(socket, '請先連線準備好。', 'nosession');
     const room = store.get(String(payload.code || '').toUpperCase());
     if (!room) return fail(socket, '找不到這個房間，可能已經關閉。', 'gone');
+    if (payload.name !== undefined) session.name = sanitizeName(payload.name, session.name);
     const requestedRole = payload.role === 'observer' ? 'observer' : 'player';
     let role = requestedRole;
     const invite = String(payload.invite || '');

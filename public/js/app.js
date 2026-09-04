@@ -7,7 +7,7 @@
     mode: 'solo',
     screen: 'home',
     local: { game: null, playerId: 'local-player', ai: null, timer: null },
-    online: { room: null, role: null, credentials: null, invited: false },
+    online: { room: null, role: null, credentials: null, pendingInvite: null, entryPrepared: false },
     toastTimer: null,
     lastSettingsFocus: null
   };
@@ -237,17 +237,42 @@
     document.querySelectorAll('.room-join').forEach(function (button) { button.addEventListener('click', function () { joinOnlineRoom(button.dataset.code, button.dataset.role); }); });
   }
 
-  function connectOnline() {
-    if (!Config.isOnlineEnabled()) { toast(Config.error || '尚未設定線上伺服器。請在設定或網址參數提供 serverUrl。'); openDialog($('settingsDialog'), $('musicToggle')); return; }
-    var name = Store.nick();
-    Online.connect({ clientId: Store.clientId(), name: name }).then(function () {
-      var entry = Config.entry();
-      if (entry.room) { app.online.invited = true; Online.send('room:join', { code: entry.room, invite: entry.invite, role: entry.role }); }
-      else Online.send('lobby:subscribe');
-    }).catch(function (error) { toast(error.message); });
+  function prepareInvite(entry) {
+    app.online.pendingInvite = { code: entry.room, invite: entry.invite || '', role: entry.role || 'player' };
+    $('lobby-nick').value = Store.nick();
+    $('invite-gate').hidden = false;
+    $('invite-gate-note').textContent = entry.invite
+      ? '正在確認邀請連結；請先設定你的暱稱，再加入這間超市。'
+      : '請先設定你的暱稱，再加入這間超市。';
   }
 
-  function enterLobby() { showScreen('lobby'); connectOnline(); }
+  function joinPendingInvite() {
+    var invite = app.online.pendingInvite;
+    if (!invite) return;
+    var name = $('lobby-nick').value.trim().slice(0, 20);
+    if (!name) {
+      toast('請先輸入暱稱，再加入邀請房間。');
+      $('lobby-nick').focus();
+      return;
+    }
+    Store.nick(name);
+    joinOnlineRoom(invite.code, invite.role, invite.invite);
+  }
+
+  function connectOnline() {
+    if (!Config.isOnlineEnabled()) { toast(Config.error || '尚未設定線上伺服器。請在設定或網址參數提供 serverUrl。'); openDialog($('settingsDialog'), $('musicToggle')); return; }
+    var entry = Config.entry();
+    if (entry.room && !app.online.entryPrepared) {
+      prepareInvite(entry);
+      app.online.entryPrepared = true;
+    }
+    var name = Store.nick();
+    return Online.connect({ clientId: Store.clientId(), name: name }).then(function () {
+      Online.send('lobby:subscribe');
+    }).catch(function (error) { toast(error.message); throw error; });
+  }
+
+  function enterLobby() { showScreen('lobby'); connectOnline().catch(function () {}); }
 
   function createRoom() {
     if (!Online.connected()) return connectOnline();
@@ -256,8 +281,13 @@
   }
 
   function joinOnlineRoom(code, role, invite) {
-    if (!Online.connected()) return connectOnline();
-    Online.send('room:join', { code: code, role: role || 'player', invite: invite || '' });
+    var sendJoin = function () {
+      Online.send('room:join', {
+        code: code, role: role || 'player', invite: invite || '', name: Store.nick()
+      });
+    };
+    if (!Online.connected()) return connectOnline().then(sendJoin).catch(function () {});
+    sendJoin();
   }
 
   function leaveRoom(toHome) {
@@ -287,6 +317,8 @@
     updateHomeMode();
     document.querySelectorAll('.mode-option').forEach(function (button) { button.addEventListener('click', function () { app.mode = button.dataset.mode; updateHomeMode(); GameAudio.play('click'); }); });
     $('playerName').addEventListener('input', function () { Store.nick($('playerName').value.trim() || '小店員'); });
+    $('lobby-nick').value = Store.nick();
+    $('lobby-nick').addEventListener('input', function () { Store.nick($('lobby-nick').value.trim().slice(0, 20)); });
     $('homeActionButton').addEventListener('click', function () { GameAudio.unlock(); if (app.mode === 'online') enterLobby(); else startLocal(app.mode === 'ai'); });
     $('tutorialButton').addEventListener('click', function () { app.lastSettingsFocus = $('tutorialButton'); openDialog($('tutorialDialog'), $('tutorialStartButton')); });
     $('tutorialClose').addEventListener('click', function () { $('tutorialDialog').close(); });
@@ -295,6 +327,7 @@
     document.querySelectorAll('[data-action="home"]').forEach(function (button) { button.addEventListener('click', function () { Online.disconnect(); showScreen('home'); }); });
     document.querySelector('[data-action="leave-room"]').addEventListener('click', function () { leaveRoom(false); });
     $('refreshLobby').addEventListener('click', function () { Online.send('lobby:subscribe'); }); $('createRoomButton').addEventListener('click', createRoom);
+    $('joinInviteButton').addEventListener('click', function () { GameAudio.play('click'); joinPendingInvite(); });
     $('readyButton').addEventListener('click', function () { var ready = app.online.room && app.online.room.me && app.online.room.me.ready; Online.send('room:ready', { ready: !ready }); });
     $('startRoomButton').addEventListener('click', function () { Online.send('room:start'); });
     $('copyInviteButton').addEventListener('click', function () { var c = app.online.credentials; copyText(c && Config.inviteUrl(app.online.room.room.code, c.playerToken, 'player')); });
@@ -315,7 +348,11 @@
     Online.on('lobby:rooms', function (event) { renderLobby(event.rooms || []); });
     Online.on('room:created', function (event) { app.online.credentials = event.credentials; app.online.role = event.role; toast('房間開好了，邀請朋友一起來吧！'); });
     Online.on('room:credentials', function (event) { app.online.credentials = event.credentials; toast('邀請連結已更新。'); });
-    Online.on('room:joined', function (event) { app.online.role = event.role; });
+    Online.on('room:joined', function (event) {
+      app.online.role = event.role;
+      app.online.pendingInvite = null;
+      $('invite-gate').hidden = true;
+    });
     Online.on('room:state', function (event) {
       var state = event.state; if (!state) return;
       app.online.role = state.me && state.me.role;

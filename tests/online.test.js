@@ -61,11 +61,12 @@ class TestClient {
     assert.ok(created.credentials.playerToken);
     console.log('✓ 建立房間與玩家邀請憑證');
 
-    two.send('room:join', { code: created.code, role: 'player' });
+    two.send('room:join', { code: created.code, role: 'player', name: '自訂暱稱客人' });
     const joined = await two.wait('room:joined');
     const joinedState = await two.wait('room:state');
     assert.strictEqual(joined.role, 'player');
     assert.strictEqual(joinedState.state.players.length, 2);
+    assert.ok(joinedState.state.players.some((player) => player.name === '自訂暱稱客人'));
     console.log('✓ 第二位玩家加入房間');
 
     one.send('room:ready', { ready: true }); two.send('room:ready', { ready: true });
