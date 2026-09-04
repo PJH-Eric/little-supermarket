@@ -105,3 +105,43 @@ p { line-height: 1.65; } small { color: var(--muted); }
 
 .customer-svg { width: 100%; height: 100%; }
 .basket-counter svg { width: 28px; height: 25px; }
+
+/* ================================================================
+ * 手機軟體鍵盤修正（js/keyboard.js 量測後寫入 --app-h／--kb）
+ * 小小聊天室在手機版是收在 position:fixed 的側邊欄裡，iOS 的 fixed
+ * 不會跟著鍵盤讓開，輸入框會被整條蓋住，這裡讓它往上推。
+ * ================================================================ */
+input,textarea,select{user-select:text;-webkit-user-select:text}
+@media (pointer:coarse){
+  .chat-form input,#chatInput{font-size:16px}
+}
+/* 鍵盤蓋住的那段補成頁面下緣的留白，瀏覽器才有空間把輸入框捲上來 */
+body.kb-open .game-screen{padding-bottom:calc(var(--kb,0px) + 50vh)}
+body.kb-open .info-sidebar{
+  bottom:calc(15px + var(--kb,0px));
+  max-height:calc(var(--app-h,100dvh) - 93px);
+}
+body.kb-open .floating-sidebar-button{bottom:calc(max(18px,env(safe-area-inset-bottom)) + var(--kb,0px))}
+
+/* 矮橫向（手機橫拿）鍵盤升起後只剩很窄一條可見，這時側邊欄縮成只放聊天室的
+ * 浮層蓋在畫面上，打字時視覺才不會整片被推走。 */
+@media (orientation:landscape) and (max-height:560px){
+  body.kb-open .game-screen{padding-bottom:0}
+  /* .screen 的進場動畫用 fill-mode:both，會一直留著 transform，讓側邊欄的
+   * position:fixed 變成相對於它而不是畫面；打字時先把它拿掉。 */
+  body.kb-open .screen{animation:none;transform:none}
+  body.kb-open .info-sidebar.open{
+    transform:none;top:6px;left:8px;right:8px;bottom:auto;width:auto;
+    height:calc(var(--app-h,100dvh) - 12px);max-height:none;
+    padding:10px 12px;gap:8px;z-index:200;
+  }
+  body.kb-open .info-sidebar.open .summary-box,
+  body.kb-open .info-sidebar.open .score-list{display:none}
+  body.kb-open .info-sidebar.open .sidebar-head h2{font-size:1rem}
+  body.kb-open .info-sidebar.open .sidebar-head .eyebrow{display:none}
+  body.kb-open .info-sidebar.open .chat-box{
+    flex:1 1 auto;min-height:0;border-top:0;padding-top:0;
+  }
+  body.kb-open .info-sidebar.open .chat-messages{min-height:0;max-height:none}
+  body.kb-open .info-sidebar.open .chat-heading{margin-bottom:6px}
+}
